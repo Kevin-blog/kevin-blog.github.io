@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信号报告 · 我的个人博客</title>
+<meta name="description" content="一个 18 岁湖南少年的个人博客：摄影、航拍、编程、无线电与摩托车旅行。">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  /* ===== 设计 token ===== */
+  :root {
+    --bg: #101318;
+    --bg-2: #161a21;
+    --bg-3: #1c212b;
+    --line: rgba(233, 228, 218, 0.12);
+    --ink: #e9e4da;
+    --ink-dim: #a4a49c;
+    --ink-faint: #6f726e;
+    --accent: #ff6a2b;
+    --accent-soft: rgba(255, 106, 43, 0.14);
+    --teal: #8fc3cf;
+    --serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --sans: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+    --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    --maxw: 1080px;
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  ul { list-style: none; }
+
+  ::selection { background: var(--accent); color: #14100c; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* ===== 信号波形（签名元素之一） ===== */
+  .wave {
+    width: 148px;
+    height: 18px;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .wave svg { width: 100%; height: 100%; }
+  .wave path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .wave--anim path { stroke-dasharray: 240; stroke-dashoffset: 240; animation: trace 1.6s var(--ease) forwards; }
+
+  @keyframes trace { to { stroke-dashoffset: 0; } }
+
+  /* ===== 顶部导航 ===== */
+  .site-nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(16, 19, 24, 0.82);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 28px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .brand::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(255, 106, 43, 0.5);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 106, 43, 0.45); }
+    70% { box-shadow: 0 0 0 9px rgba(255, 106, 43, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 106, 43, 0); }
+  }
+  .nav-links {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: var(--ink-dim);
+    padding: 8px 9px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-links a:hover { color: var(--ink); background: rgba(233, 228, 218, 0.06); }
+  .nav-links a.active { color: var(--accent); }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    color: var(--ink);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-toggle svg { width: 20px; height: 20px; }
+
+  /* ===== 通用章节 ===== */
+  section { padding: 110px 28px; }
+  .shell { max-width: var(--maxw); margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: clamp(30px, 4.4vw, 44px);
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+  }
+  .section-sub {
+    margin-top: 16px;
+    color: var(--ink-dim);
+    max-width: 560px;
+    font-size: 15px;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* EXIF 标注（签名元素） */
+  .exif {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    text-transform: uppercase;
+  }
+  .exif b { color: var(--teal); font-weight: 500; }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding: 140px 28px 96px;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(180deg, rgba(16, 19, 24, 0.55) 0%, rgba(16, 19, 24, 0.25) 42%, rgba(16, 19, 24, 0.92) 100%),
+      linear-gradient(90deg, rgba(16, 19, 24, 0.85) 0%, rgba(16, 19, 24, 0.15) 70%),
+      url("https://aka.doubaocdn.com/s/VkYGqOlv5Y");
+    background-size: cover;
+    background-position: center 32%;
+  }
+  .hero-inner {
+    position: relative;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: clamp(34px, 6.4vw, 72px);
+    line-height: 1.22;
+    letter-spacing: 0.01em;
+    max-width: 14em;
+  }
+  .hero .lede {
+    margin-top: 26px;
+    font-size: clamp(15px, 1.8vw, 18px);
+    color: #cfc9bd;
+    max-width: 30em;
+  }
+  .scroll-hint {
+    margin-top: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+    padding: 11px 18px;
+    border-radius: 999px;
+    min-height: 44px;
+    transition: color 0.25s, border-color 0.25s, background 0.25s;
+  }
+  .scroll-hint:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .scroll-hint svg { width: 14px; height: 14px; animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+  .hero-exif {
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    bottom: 26px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== 关于 ===== */
+  .about { background: var(--bg-2); }
+  .about-grid {
+    margin-top: 46px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .about-text p { font-size: 16px; color: #c9c3b7; margin-bottom: 18px; }
+  .about-text p strong { color: var(--ink); font-weight: 500; }
+  .about-text .hl { color: var(--accent); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .stats li {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .stats li:hover { border-color: rgba(255, 106, 43, 0.45); transform: translateY(-3px); }
+  .stats .num {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: 34px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stats .loc {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+  }
+  .stats .label { font-size: 13px; color: var(--ink-dim); }
+
+  /* ===== 爱好 ===== */
+  .field-grid {
+    margin-top: 46px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
+  }
+  .field-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .field-card:hover { border-color: rgba(255, 106, 43, 0.5); transform: translateY(-4px); }
+  .field-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .field-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .field-card:hover .field-media img { transform: scale(1.05); }
+  .field-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink);
+    background: rgba(16, 19, 24, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    border-radius: 999px;
+  }
+  .ai-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    background: rgba(16, 19, 24, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+  .field-body { padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .field-body h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: 0.02em;
+  }
+  .field-body p { font-size: 14px; color: var(--ink-dim); flex: 1; }
+  .field-body .exif { padding-top: 14px; border-top: 1px solid var(--line); margin-top: 4px; }
+
+  /* ===== 家乡 ===== */
+  .hometown { background: var(--bg-2); }
+  .hometown-grid {
+    margin-top: 46px;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 44px;
+    align-items: center;
+  }
+  .hometown-photo {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    aspect-ratio: 4 / 3;
+  }
+  .hometown-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .hometown-photo .exif {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    color: #d8d2c6;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  }
+  .hometown-photo .exif b { color: var(--accent); }
+  .hometown-copy p { font-size: 16px; color: #c9c3b7; margin-bottom: 16px; }
+  .hometown-copy p strong { color: var(--ink); font-weight: 500; }
+  .hometown-facts {
+    margin-top: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .hometown-facts span {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: var(--bg-3);
+  }
+  .hometown-facts span b { color: var(--teal); font-weight: 500; }
+
+  /* ===== 在路上 ===== */
+  .track-grid {
+    margin-top: 46px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+  .track-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-2);
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 200px;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .track-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+    opacity: 0.35;
+    transition: opacity 0.3s;
+  }
+  .track-card:hover { border-color: rgba(255, 106, 43, 0.5); transform: translateY(-4px); }
+  .track-card:hover::after { opacity: 1; }
+  .track-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+  }
+  .track-state {
+    position: absolute;
+    top: 26px;
+    right: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    border: 1px solid rgba(255, 106, 43, 0.4);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 5px 11px;
+  }
+  .track-state--done { color: var(--teal); border-color: rgba(143, 195, 207, 0.4); background: rgba(143, 195, 207, 0.1); }
+  .track-card h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 24px;
+    padding-right: 74px;
+  }
+  .track-card p { font-size: 14px; color: var(--ink-dim); }
+  .track-card .exif { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+
+  /* ===== 关注的人 ===== */
+  .people-title {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    margin: 26px 0 4px;
+  }
+  .people-sub { font-size: 11px; color: var(--ink-dim); margin-bottom: 8px; }
+  .people-list {
+    margin-top: 16px;
+    display: grid;
+    gap: 8px;
+  }
+  .people-card {
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 12px;
+    align-items: start;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 16px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .people-card:hover { border-color: rgba(255, 106, 43, 0.5); transform: translateY(-1px); }
+  .people-rank {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: 17px;
+    color: var(--accent);
+    line-height: 1;
+    padding-top: 2px;
+  }
+  .people-main h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin-bottom: 3px;
+  }
+  .people-main p { font-size: 11px; color: var(--ink-dim); }
+  .people-main .exif { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+  @media (max-width: 560px) {
+    .people-card { grid-template-columns: 1fr; gap: 5px; }
+  }
+
+  /* ===== 作品集 ===== */
+  .work-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .work-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    aspect-ratio: 4 / 3;
+  }
+  .work-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .work-item:hover img { transform: scale(1.05); }
+  .work-cap {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 30px 14px 10px;
+    background: linear-gradient(180deg, transparent, rgba(16, 19, 24, 0.92));
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .work-cap b {
+    display: block;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  /* ===== 通用小卡（日志/装备/电台/愿望/学习） ===== */
+  .mini-grid { margin-top: 36px; display: grid; gap: 12px; }
+  .mini-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .mini-3 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .mini-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 15px 17px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .mini-card:hover { border-color: rgba(255, 106, 43, 0.45); transform: translateY(-2px); }
+  .mini-card h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+  .mini-card p { font-size: 12px; color: var(--ink-dim); }
+  .mini-card ul { list-style: none; }
+  .mini-card li {
+    font-size: 12px;
+    color: var(--ink-dim);
+    padding: 3px 0 3px 16px;
+    position: relative;
+  }
+  .mini-card li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.7;
+  }
+  .mini-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    border: 1px solid rgba(143, 195, 207, 0.4);
+    background: rgba(143, 195, 207, 0.1);
+    border-radius: 999px;
+    padding: 3px 9px;
+    margin-bottom: 7px;
+  }
+  .mini-tag--accent { color: var(--accent); border-color: rgba(255, 106, 43, 0.4); background: var(--accent-soft); }
+  .log-date {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .journey-step { display: flex; gap: 14px; align-items: baseline; }
+  .journey-num {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 34px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 84px 28px 40px;
+    background: var(--bg);
+  }
+  .footer-inner { max-width: var(--maxw); margin: 0 auto; }
+  .footer-sign {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: clamp(24px, 3.6vw, 34px);
+    line-height: 1.4;
+    max-width: 18em;
+  }
+  .footer-sign .hl { color: var(--accent); }
+  .footer-meta {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 860px) {
+    .about-grid, .hometown-grid { grid-template-columns: 1fr; gap: 32px; }
+    section { padding: 84px 20px; }
+    .hero { padding: 130px 20px 88px; }
+    .hero-exif { left: 20px; right: 20px; }
+    .nav-toggle { display: inline-flex; }
+    .nav-links {
+      position: absolute;
+      top: 62px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      background: rgba(16, 19, 24, 0.97);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 20px 16px;
+      gap: 2px;
+      display: none;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { min-height: 46px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<header class="site-nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">SIGNAL&nbsp;REPORT · 26.4°N</a>
+    <button class="nav-toggle" aria-label="打开菜单" aria-expanded="false" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks" aria-label="页面导航">
+      <a href="#about">关于</a>
+      <a href="#fields">爱好</a>
+      <a href="#hometown">家乡</a>
+      <a href="#track">在路上</a>
+      <a href="#works">作品</a>
+      <a href="#log">日志</a>
+      <a href="#gear">装备</a>
+      <a href="#journey">轨迹</a>
+      <a href="#radio">电台</a>
+      <a href="#wishlist">愿望</a>
+      <a href="#study">学习</a>
+      <a href="#contact">联系</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ===== Hero ===== -->
+  <section id="top" class="hero">
+    <div class="hero-bg" role="img" aria-label="黄昏时分，骑手驾驶摩托车行驶在湖南山间公路，两旁是竹海丘陵"></div>
+    <div class="hero-inner">
+      <p class="eyebrow">PERSONAL FREQUENCY · HUNAN / LEIYANG</p>
+      <h1>在湖南的山里，<br>我有一部相机和一辆摩托。</h1>
+      <p class="lede">摄影、航拍、编程、无线电、摩旅。18 岁的高中生，也是自己频道的唯一主理人。</p>
+      <a class="scroll-hint" href="#about">
+        往下翻，听我汇报信号
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v14m0 0l-5-5m5 5l5-5"/></svg>
+      </a>
+    </div>
+    <div class="hero-exif exif">
+      <span><b>LOC</b> 耒阳 · 山间公路</span>
+      <span><b>FRAME</b> 18:47 · 暮色</span>
+      <span><b>SPEED</b> 80 km/h</span>
+      <span><b>NOTE</b> 主视觉为 AI 生成配图</span>
+    </div>
+  </section>
+
+  <!-- ===== 关于 ===== -->
+  <section id="about" class="about">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">01 · ABOUT</p>
+        <h2 class="section-title">关于我</h2>
+        <p class="section-sub">先报一段自我介绍，频率稳定，信号清晰。</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>我叫<strong>Kevin</strong>，来自湖南耒阳——蔡伦的故里，竹海之乡。18 岁，高中生，同时在运营自己的短视频频道。</p>
+          <p>白天在学校上课，晚上剪片子、调参数、研究新装备。喜欢用镜头记录家乡，也喜欢折腾无线电和写点小脚本。<span class="hl">爱好对我来说不是消遣，是另一种功课</span>——每一样都要搞明白原理，才算真的玩懂了。</p>
+          <p>这台博客没什么宏大叙事，就是我的信号发射塔：把拍到的东西、走过的路、正在研究的事，都发出来。</p>
+        </div>
+        <ul class="stats reveal">
+          <li><span class="num">18</span><span class="label">岁 · 高中生</span></li>
+          <li><span class="num">5</span><span class="label">个长期爱好</span></li>
+          <li><span class="num">1</span><span class="label">个自营频道</span></li>
+          <li><span class="loc">26.4°N / 112.8°E</span><span class="label">常驻湖南 · 耒阳</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 爱好 ===== -->
+  <section id="fields">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">02 · FIELDS</p>
+        <h2 class="section-title">我的五个频率</h2>
+        <p class="section-sub">每一样都是长期频道，不断线。</p>
+      </div>
+
+      <div class="field-grid">
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/d85DvBJOnm" alt="桌上放着复古机械相机和胶卷，侧逆光" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.01 / CAMERA</span>
+          </div>
+          <div class="field-body">
+            <h3>摄影</h3>
+            <p>相机不离手。光、构图、瞬间，拍人拍景，也拍家乡每天不一样的清晨。</p>
+            <div class="exif"><span><b>LENS</b> 定焦优先</span><span><b>SUBJ</b> 家乡日常</span></div>
+          </div>
+        </article>
+
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/VEkm23JcED" alt="无人机俯瞰竹海与蜿蜒河流，晨雾弥漫" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.02 / AERIAL</span>
+          </div>
+          <div class="field-body">
+            <h3>航拍</h3>
+            <p>换一个角度，耒阳的竹海就是另一片海。无人机教会我从高处看世界。</p>
+            <div class="exif"><span><b>ALT</b> 300 m</span><span><b>SUBJ</b> 耒水 · 竹海</span></div>
+          </div>
+        </article>
+
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/RnIjkpTM2A" alt="昏暗房间里显示器亮着代码，暖橙色的光" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.03 / CODE</span>
+          </div>
+          <div class="field-body">
+            <h3>编程</h3>
+            <p>从命令行到小脚本，享受让机器听我话的感觉。能自动化的事，绝不手动。</p>
+            <div class="exif"><span><b>LANG</b> shell · js</span><span><b>USE</b> 自动化</span></div>
+          </div>
+        </article>
+
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/AcHIAIc3pU" alt="暗房里的短波电台，金属旋钮和绿色荧光表盘" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.04 / RADIO</span>
+          </div>
+          <div class="field-body">
+            <h3>无线电</h3>
+            <p>短波里藏着远方的声音。正在攒设备、啃规则，向执照的方向调谐。</p>
+            <div class="exif"><span><b>BAND</b> HF · 短波</span><span><b>STATUS</b> 执照备考中</span></div>
+          </div>
+        </article>
+
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/JJL1prhLAA" alt="清晨薄雾中蜿蜒的山间公路，摩托车驶向远方" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.05 / RIDE</span>
+          </div>
+          <div class="field-body">
+            <h3>摩托车旅行</h3>
+            <p>一辆摩托，一条山路，头盔一戴世界就安静了。路越远，信号越强。</p>
+            <div class="exif"><span><b>ROUTE</b> 湖南 · 山间</span><span><b>NEXT</b> 西藏 · 3400 km</span></div>
+          </div>
+        </article>
+
+        <article class="field-card reveal">
+          <div class="field-media">
+            <img src="https://aka.doubaocdn.com/s/VkYGqOlv5Y" alt="黄昏骑行在丘陵竹海间的公路，逆光剪影" loading="lazy">
+            <span class="ai-badge">AI 生成</span>
+            <span class="field-tag">CH.06 / CREATE</span>
+          </div>
+          <div class="field-body">
+            <h3>短视频创作</h3>
+            <p>把上面五样打包成作品：剪辑、口播、节奏、留存。拍好家乡，就是我的选题库。</p>
+            <div class="exif"><span><b>FORMAT</b> 竖屏 · 口播</span><span><b>THEME</b> 家乡 · 旅行 · 数码</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 家乡 ===== -->
+  <section id="hometown" class="hometown">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">03 · HOMETOWN</p>
+        <h2 class="section-title">家乡：耒阳</h2>
+        <p class="section-sub">我拍得最多的地方，也是我所有出发的起点。</p>
+      </div>
+
+      <div class="hometown-grid">
+        <figure class="hometown-photo reveal">
+          <img src="https://aka.doubaocdn.com/s/VEkm23JcED" alt="航拍耒阳竹海，河流蜿蜒穿过翠绿山丘，晨雾弥漫" loading="lazy">
+          <span class="ai-badge">AI 生成</span>
+          <figcaption class="exif">
+            <span><b>LOC</b> 耒阳 · 竹海</span>
+            <span><b>DEV</b> aerial</span>
+            <span><b>TIME</b> 06:42 · 晨雾</span>
+          </figcaption>
+        </figure>
+        <div class="hometown-copy reveal">
+          <p>耒阳是<strong>蔡伦的故里</strong>——东汉时候，纸就是在这片土地上造出来的。到今天，古法造纸的手艺还在。</p>
+          <p>我家门口有<strong>竹海</strong>，有耒水，有讲不完的老故事。航拍视角看过去，山丘像浪一样一层层推远。</p>
+          <p>馋了就去吃<strong>衡阳炒粉</strong>。对我而言，家乡不只是户口本上的地址，更是镜头里永远拍不腻的题材库。</p>
+          <div class="hometown-facts">
+            <span><b>蔡伦故里</b></span>
+            <span><b>古法造纸</b></span>
+            <span><b>竹海</b></span>
+            <span><b>衡阳炒粉</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hometown-people">
+        <h3 class="people-title">耒阳走出的知名人物</h3>
+        <p class="people-sub">小城不小，走出的名字个个响。</p>
+        <div class="people-list">
+          <article class="people-card reveal">
+            <span class="people-rank">01</span>
+            <div class="people-main">
+              <h3>蔡伦</h3>
+              <p>东汉桂阳郡耒阳人，字敬仲，封龙亭侯。改进造纸术，被后世尊为"纸圣"，人类文明绕不开他的名字。</p>
+              <div class="exif"><span><b>FIELD</b> 科技 · 发明</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+
+          <article class="people-card reveal">
+            <span class="people-rank">02</span>
+            <div class="people-main">
+              <h3>罗翔</h3>
+              <p>中国政法大学教授，1977 年生于湖南耒阳。"法外狂徒张三"火遍全网，让刑法成了很多人追更的连续剧，也是无数人的法律启蒙。</p>
+              <div class="exif"><span><b>FIELD</b> 法学 · 普法</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+
+          <article class="people-card reveal">
+            <span class="people-rank">03</span>
+            <div class="people-main">
+              <h3>曹芬</h3>
+              <p>抖音顶流"布叮x"，本名曹芬，2001 年生于湖南耒阳。颜值出圈，花手舞技和"曹芬嘿嘿"一起成了评论区经典，正儿八经的老乡。</p>
+              <div class="exif"><span><b>FIELD</b> 短视频 · 颜值</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+
+          <article class="people-card reveal">
+            <span class="people-rank">04</span>
+            <div class="people-main">
+              <h3>邓丽娟</h3>
+              <p>巴黎奥运会女子速度攀岩银牌得主，中国首枚奥运攀岩奖牌，耒阳妹子，一战成名。</p>
+              <div class="exif"><span><b>FIELD</b> 体育 · 攀岩</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+
+          <article class="people-card reveal">
+            <span class="people-rank">05</span>
+            <div class="people-main">
+              <h3>邓铭江</h3>
+              <p>中国工程院院士，干旱区水资源与水利工程专家，湖南耒阳人。把水送到最缺水的地方，是真正的"水利人"。</p>
+              <div class="exif"><span><b>FIELD</b> 工程 · 水利</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+
+          <article class="people-card reveal">
+            <span class="people-rank">06</span>
+            <div class="people-main">
+              <h3>谢维</h3>
+              <p>1996 年生于耒阳，综合格斗运动员，绰号"猎人"。签约 ONE 冠军赛、UFC，在海外擂台为国争光。</p>
+              <div class="exif"><span><b>FIELD</b> 体育 · 格斗</span><span><b>FROM</b> 湖南 · 耒阳</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 在路上 ===== -->
+  <section id="track">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">04 · ON THE ROAD</p>
+        <h2 class="section-title">在路上</h2>
+        <p class="section-sub">里程数只会增加，不会清零。</p>
+      </div>
+
+      <div class="track-grid">
+        <article class="track-card reveal" data-date="2026-08-12">
+          <span class="track-no">WAYPOINT 01</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>武功山</h3>
+          <p>夜爬看流星雨，山顶等日出，顺道在萍乡市区吃了一圈。值回票价，下次还去。</p>
+          <div class="exif"><span><b>TIME</b> 2026.08.12</span><span><b>TYPE</b> 徒步 · 夜爬</span><span><b>PACK</b> 流星雨</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2026-07-15">
+          <span class="track-no">WAYPOINT 02</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>重庆 · 武隆</h3>
+          <p>喀斯特地貌的深度游，从天生三桥到仙女山，山城的立体感是别处没有的。</p>
+          <div class="exif"><span><b>TIME</b> 2026.07.15–07.19</span><span><b>TYPE</b> 山地 · 深度游</span><span><b>MEMO</b> 立体城市</span></div>
+        </article>
+
+        <article class="track-card reveal">
+          <span class="track-no">WAYPOINT 03</span>
+          <span class="track-state">规划中</span>
+          <h3>西藏 · 3400 km 摩旅</h3>
+          <p>从湖南一路向西，油费、住宿、海拔和装备清单都在表格里。下一站，高原。</p>
+          <div class="exif"><span><b>TIME</b> 未定</span><span><b>DIST</b> ≈ 3400 km</span><span><b>FUEL</b> 95# 预算已算</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2026-02-09">
+          <span class="track-no">WAYPOINT 07</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>广州</h3>
+          <p>早茶、珠江夜景、老骑楼。粤式烟火气，从早吃到晚也不腻。</p>
+          <div class="exif"><span><b>TIME</b> 2026.02.09–02.10</span><span><b>TYPE</b> 城市 · 美食</span><span><b>MEMO</b> 早茶 · 珠江</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2025-10-03">
+          <span class="track-no">WAYPOINT 08</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>南京</h3>
+          <p>钟山、秦淮河、梧桐大道。古都的厚重感，慢逛才品得出来。</p>
+          <div class="exif"><span><b>TIME</b> 2025.10.03–10.05</span><span><b>TYPE</b> 城市 · 人文</span><span><b>MEMO</b> 秦淮 · 钟山</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2025-06-17">
+          <span class="track-no">WAYPOINT 06</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>香港</h3>
+          <p>维港夜景、叮叮车、茶餐厅，城市密度和烟火气并存。镜头里多了一座不夜城。</p>
+          <div class="exif"><span><b>TIME</b> 2025.06.17</span><span><b>TYPE</b> 城市 · 摄影</span><span><b>MEMO</b> 夜景 · 街巷</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2025-08-17">
+          <span class="track-no">WAYPOINT 03</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>上海</h3>
+          <p>外滩到武康路，老建筑和新天际线同框。城市人文的对比，值得反复拍。</p>
+          <div class="exif"><span><b>TIME</b> 2025.08.17</span><span><b>TYPE</b> 城市 · 人文</span><span><b>MEMO</b> 天际线 · 老街</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2025-08-16">
+          <span class="track-no">WAYPOINT 04</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>杭州</h3>
+          <p>西湖、龙井、群山。骑行环湖很舒服，山水城市的松弛感拉满。</p>
+          <div class="exif"><span><b>TIME</b> 2025.08.16</span><span><b>TYPE</b> 城市 · 山水</span><span><b>MEMO</b> 西湖 · 骑行</span></div>
+        </article>
+
+        <article class="track-card reveal" data-date="2025-08-12">
+          <span class="track-no">WAYPOINT 05</span>
+          <span class="track-state track-state--done">已完成</span>
+          <h3>南昌</h3>
+          <p>离湖南最近的省会之一。滕王阁、拌粉、一江两岸夜景，周末往返毫无压力。</p>
+          <div class="exif"><span><b>TIME</b> 2025.08.12</span><span><b>TYPE</b> 城市 · 美食</span><span><b>MEMO</b> 滕王阁 · 拌粉</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 作品集 ===== -->
+  <section id="works">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">05 · GALLERY</p>
+        <h2 class="section-title">作品集</h2>
+        <p class="section-sub">我镜头里的东西。展示位先用示例图占着，之后换成你的实拍。</p>
+      </div>
+
+      <div class="work-grid">
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/VkYGqOlv5Y" alt="黄昏骑行在丘陵竹海间的公路" loading="lazy">
+          <figcaption class="work-cap"><b>RIDE · 18:47</b>骑行 · 黄昏</figcaption>
+        </figure>
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/d85DvBJOnm" alt="桌上放着复古机械相机和胶卷" loading="lazy">
+          <figcaption class="work-cap"><b>STILL · 25mm</b>桌面的光</figcaption>
+        </figure>
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/VEkm23JcED" alt="航拍竹海与蜿蜒河流" loading="lazy">
+          <figcaption class="work-cap"><b>AERIAL · 300m</b>耒水 · 竹海</figcaption>
+        </figure>
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/RnIjkpTM2A" alt="昏暗房间里显示器亮着代码" loading="lazy">
+          <figcaption class="work-cap"><b>CODE · 02:14</b>深夜编译</figcaption>
+        </figure>
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/AcHIAIc3pU" alt="暗房里的短波电台" loading="lazy">
+          <figcaption class="work-cap"><b>HF · 7.050</b>信号调谐</figcaption>
+        </figure>
+        <figure class="work-item reveal">
+          <img src="https://aka.doubaocdn.com/s/JJL1prhLAA" alt="清晨薄雾中的山间公路" loading="lazy">
+          <figcaption class="work-cap"><b>ROAD · 06:42</b>晨雾山路</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 动态日志 ===== -->
+  <section id="log">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">06 · LOG</p>
+        <h2 class="section-title">动态日志</h2>
+        <p class="section-sub">随手记，不保证日更。</p>
+      </div>
+
+      <div class="mini-grid">
+        <article class="mini-card reveal">
+          <span class="log-date">2026.09</span>
+          <h3>短波执照备考中</h3>
+          <p>规则手册已经啃到第三遍，通联礼仪记了满满一页笔记。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="log-date">2026.09</span>
+          <h3>装备研究清单更新</h3>
+          <p>长焦卡片机和无线麦克风都躺在购物车里，参数对比做了一整页。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="log-date">2026.08</span>
+          <h3>武功山夜爬达成</h3>
+          <p>流星雨和日出都见到了，值回票价，下次还去。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="log-date">2026.08</span>
+          <h3>频道更新中</h3>
+          <p>竹海航拍的片子正在剪，下次更新见。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 装备墙 ===== -->
+  <section id="gear">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">07 · GEAR</p>
+        <h2 class="section-title">装备墙</h2>
+        <p class="section-sub">在用的和种草的，清单实时更新。</p>
+      </div>
+
+      <div class="mini-grid mini-3">
+        <article class="mini-card reveal">
+          <span class="mini-tag mini-tag--accent">影像 · 种草中</span>
+          <h3>长焦卡片机</h3>
+          <p>揣兜里的长焦，街拍和骑行路上都想带一台。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag mini-tag--accent">音频 · 种草中</span>
+          <h3>无线麦克风</h3>
+          <p>口播收音的下一步升级，参数已经比过一轮。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag mini-tag--accent">骑行 · 研究中</span>
+          <h3>启典 150G1</h3>
+          <p>轻量入门车，油费、保养、二手行情都算过。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag mini-tag--accent">电台 · 攒机中</span>
+          <h3>短波设备</h3>
+          <p>接收机、天线、耳麦，一件一件往家里搬。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag mini-tag--accent">数码 · 观望中</span>
+          <h3>旗舰手机</h3>
+          <p>影像和视频能力都想要，等一个合适的时机。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 成长轨迹 ===== -->
+  <section id="journey">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">08 · JOURNEY</p>
+        <h2 class="section-title">成长轨迹</h2>
+        <p class="section-sub">爱好是怎么一个串一个长出来的。</p>
+      </div>
+
+      <div class="mini-grid">
+        <article class="mini-card reveal journey-step">
+          <span class="journey-num">01</span>
+          <div>
+            <h3>摄影，先学会看光</h3>
+            <p>拿起相机之后，才开始认真看傍晚的光线和路过的影子。</p>
+          </div>
+        </article>
+        <article class="mini-card reveal journey-step">
+          <span class="journey-num">02</span>
+          <div>
+            <h3>航拍，换一个视角</h3>
+            <p>飞起来之后，熟悉的竹海变成另一片海，家乡有了新打开方式。</p>
+          </div>
+        </article>
+        <article class="mini-card reveal journey-step">
+          <span class="journey-num">03</span>
+          <div>
+            <h3>编程，把重复的活自动化</h3>
+            <p>从命令行到小脚本，能交给机器的绝不手搓。</p>
+          </div>
+        </article>
+        <article class="mini-card reveal journey-step">
+          <span class="journey-num">04</span>
+          <div>
+            <h3>无线电，把耳朵伸向远方</h3>
+            <p>短波里传来几千公里外的声音，那一刻很上头。</p>
+          </div>
+        </article>
+        <article class="mini-card reveal journey-step">
+          <span class="journey-num">05</span>
+          <div>
+            <h3>摩旅，把一切装上车出发</h3>
+            <p>相机、无人机、电台和一颗想跑远的心，一辆摩托全带走。</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 电台日志 ===== -->
+  <section id="radio">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">09 · RADIO LOG</p>
+        <h2 class="section-title">电台日志</h2>
+        <p class="section-sub">短波里藏着远方，这里记录调谐的每一步。</p>
+      </div>
+
+      <div class="mini-grid mini-2">
+        <article class="mini-card reveal">
+          <span class="mini-tag">进度 · 备考中</span>
+          <h3>短波执照</h3>
+          <p>规则、频率划分、通联礼仪一起啃，考过就开台。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">进度 · 攒机中</span>
+          <h3>设备清单</h3>
+          <p>接收机、天线、耳麦，清单上每一项都在等预算。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">笔记 · 占位</span>
+          <h3>频率笔记</h3>
+          <p>第一份通联记录，留给未来的自己填。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">听感 · 进行中</span>
+          <h3>最近的短波</h3>
+          <p>远方的声音比想象中热闹，时差和距离都被压缩在旋钮里。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 愿望清单 ===== -->
+  <section id="wishlist">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">10 · BUCKET LIST</p>
+        <h2 class="section-title">愿望清单</h2>
+        <p class="section-sub">想到就写下来，写下来就去实现。</p>
+      </div>
+
+      <div class="mini-grid mini-3">
+        <article class="mini-card reveal">
+          <h3>想去</h3>
+          <ul>
+            <li>入门级雪山，第一座 5000 米</li>
+            <li>越南跨国火车，一路向南</li>
+            <li>西藏摩旅，见在路上板块</li>
+          </ul>
+        </article>
+        <article class="mini-card reveal">
+          <h3>想买</h3>
+          <ul>
+            <li>长焦卡片机</li>
+            <li>无线麦克风</li>
+            <li>更轻的骑行装备</li>
+            <li>公路车</li>
+            <li>仿赛</li>
+            <li>影像旗舰手机</li>
+          </ul>
+        </article>
+        <article class="mini-card reveal">
+          <h3>想学</h3>
+          <ul>
+            <li>短波执照，开自己的台</li>
+            <li>英语口语，能流利开口</li>
+            <li>剪辑进阶，节奏再准一点</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 学习角 ===== -->
+  <section id="study">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div class="wave" aria-hidden="true">
+          <svg viewBox="0 0 148 18" preserveAspectRatio="none"><path d="M0 9h8l3-6 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 10 6-8 6 12 6-10 6 8 6-12 6 6h26"/></svg>
+        </div>
+        <p class="eyebrow">11 · STUDY</p>
+        <h2 class="section-title">学习角</h2>
+        <p class="section-sub">学生的主业，同样认真对待。</p>
+      </div>
+
+      <div class="mini-grid mini-2">
+        <article class="mini-card reveal">
+          <span class="mini-tag">英语</span>
+          <h3>从应用文到演讲稿</h3>
+          <p>写作、翻译、改错、口语，一套流程全链路打磨。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">数学</span>
+          <h3>不懂就问，问到懂</h3>
+          <p>三角函数、二次方程，错题本上每一道都讲得出原理。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">方法</span>
+          <h3>笨办法最可靠</h3>
+          <p>错题本加口语复述，学得明白，也玩得尽兴。</p>
+        </article>
+        <article class="mini-card reveal">
+          <span class="mini-tag">目标</span>
+          <h3>两条腿走路</h3>
+          <p>课堂上交作业，课堂外交作品，两边都不耽误。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-sign reveal">
+      信号有限，<br><span class="hl">欢迎同频。</span>
+    </div>
+    <div class="footer-meta reveal">
+      <span>© 2026 · 湖南 · 耒阳</span>
+      <span>PHOTO · AERIAL · CODE · RADIO · RIDE</span>
+      <span>本站配图均为 AI 生成</span>
+      <span>73 — 无线电问候语</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    "use strict";
+
+    /* 移动端菜单 */
+    var toggle = document.querySelector(".nav-toggle");
+    var links = document.getElementById("navLinks");
+    toggle.addEventListener("click", function () {
+      var open = links.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+    });
+    links.addEventListener("click", function (e) {
+      if (e.target.tagName === "A" && links.classList.contains("open")) {
+        links.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    /* 滚动渐入 */
+    var revealEls = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+      revealEls.forEach(function (el) { io.observe(el); });
+    } else {
+      revealEls.forEach(function (el) { el.classList.add("in"); });
+    }
+
+    /* 在路上排序规则：已完成的按时间正序（最早在前），规划中（无时间）永远靠后 */
+    var trackGrid = document.querySelector(".track-grid");
+    if (trackGrid) {
+      var trackCards = Array.prototype.slice.call(trackGrid.querySelectorAll(".track-card"));
+      trackCards.sort(function (a, b) {
+        var da = a.getAttribute("data-date");
+        var db = b.getAttribute("data-date");
+        if (!da && !db) { return 0; }
+        if (!da) { return 1; }
+        if (!db) { return -1; }
+        return da < db ? -1 : da > db ? 1 : 0;
+      });
+      trackCards.forEach(function (card, i) {
+        trackGrid.appendChild(card);
+        var no = card.querySelector(".track-no");
+        if (no) {
+          var num = i + 1;
+          no.textContent = "WAYPOINT " + (num < 10 ? "0" + num : num);
+        }
+      });
+    }
+
+    /* 首屏波形描线动画 */
+    var firstWave = document.querySelector(".wave");
+    if (firstWave) {
+      firstWave.classList.add("wave--anim");
+    }
+
+    /* 导航高亮：用 getBoundingClientRect 判断当前章节 */
+    var navAnchors = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+    var sections = navAnchors
+      .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+      .filter(Boolean);
+
+    function onScroll() {
+      var pos = window.scrollY + window.innerHeight * 0.34;
+      var current = sections[0];
+      sections.forEach(function (sec) {
+        if (sec.offsetTop <= pos) { current = sec; }
+      });
+      navAnchors.forEach(function (a) {
+        var active = current && a.getAttribute("href") === "#" + current.id;
+        a.classList.toggle("active", !!active);
+      });
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+</body>
+</html>
