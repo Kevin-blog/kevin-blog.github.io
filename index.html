@@ -550,6 +550,23 @@
     transition: transform 0.6s var(--ease);
   }
   .work-item:hover img { transform: scale(1.05); }
+  .work-item img { cursor: zoom-in; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(8, 10, 14, 0.94);
+    display: none; align-items: center; justify-content: center;
+    padding: 4vh 4vw; cursor: zoom-out;
+  }
+  .lightbox.on { display: flex; }
+  .lightbox img {
+    max-width: 100%; max-height: 100%;
+    border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .lb-close {
+    position: absolute; top: 16px; right: 26px;
+    color: #e9e4da; font-size: 34px; line-height: 1; cursor: pointer;
+    font-family: sans-serif;
+  }
   .work-cap {
     position: absolute;
     inset: auto 0 0 0;
@@ -1436,6 +1453,24 @@
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+
+    /* 作品集点击放大（灯箱），事件委托，发布器新加的图自动生效 */
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.innerHTML = '<img alt=""><span class="lb-close">×</span>';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector("img");
+    function closeLb() { lb.classList.remove("on"); lbImg.src = ""; }
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb || e.target.className === "lb-close") closeLb();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && lb.classList.contains("on")) closeLb();
+    });
+    document.addEventListener("click", function (e) {
+      var img = e.target.closest ? e.target.closest(".work-item img") : null;
+      if (img) { lbImg.src = img.src; lb.classList.add("on"); }
+    });
   })();
 </script>
 <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
