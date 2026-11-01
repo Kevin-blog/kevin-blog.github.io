@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容发布器 · 信号报告</title>
+<style>
+  :root{
+    --bg:#101318; --bg2:#161a21; --bg3:#1c212b;
+    --line:rgba(233,228,218,.12); --ink:#e9e4da; --dim:#a4a49c;
+    --accent:#ff6a2b; --teal:#8fc3cf; --ok:#7ec98f; --err:#e06c6c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC",sans-serif;line-height:1.7;padding:24px;max-width:860px;margin:0 auto}
+  h1{font-size:22px;letter-spacing:1px}
+  h1 small{font-size:12px;color:var(--dim);font-weight:400;margin-left:8px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0;padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
+  .status{font-size:13px;color:var(--dim)}
+  .status b{color:var(--ok)}
+  button{background:var(--bg3);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#14100c;border:none;font-weight:600}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  nav{display:flex;gap:6px;margin:18px 0 8px;flex-wrap:wrap}
+  nav button{background:transparent;border-radius:20px;padding:6px 16px;font-size:13px;color:var(--dim)}
+  nav button.on{background:var(--accent);color:#14100c;border-color:var(--accent);font-weight:600}
+  section.panel{display:none;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:20px}
+  section.panel.on{display:block}
+  label{display:block;font-size:12px;color:var(--dim);margin:12px 0 4px;letter-spacing:1px}
+  input,textarea,select{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-family:inherit}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  textarea{min-height:70px;resize:vertical}
+  .row{display:flex;gap:12px}.row>div{flex:1}
+  .hint{font-size:12px;color:var(--dim);margin-top:6px}
+  #msg{margin-top:16px;font-size:13px;min-height:20px}
+  #msg.ok{color:var(--ok)}#msg.err{color:var(--err)}
+  .saved{font-size:11px;color:var(--teal);margin-left:8px}
+  .witem{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-top:8px;font-size:13px}
+  .witem .wname{flex:1;color:var(--dim)}
+  .witem button{padding:4px 10px;font-size:12px;border-color:var(--err);color:var(--err);background:transparent}
+  .witem button:hover{background:rgba(224,108,108,.12)}
+</style>
+</head>
+<body>
+
+<h1>内容发布器 <small>信号报告 · 本地工具，不会上线</small></h1>
+
+<div class="bar">
+  <button id="btnOpen">1 · 选择 index.html</button>
+  <button id="btnImgDir">2 · 选择 img 目录</button>
+  <span class="status" id="fileStatus">未连接</span>
+</div>
+
+<nav>
+  <button data-tab="log" class="on">写动态</button>
+  <button data-tab="work">加作品</button>
+  <button data-tab="track">加在路上</button>
+  <button data-tab="wish">加愿望</button>
+  <button data-tab="gear">装备</button>
+  <button data-tab="radio">电台</button>
+</nav>
+
+<!-- 写动态 -->
+<section class="panel on" data-panel="log">
+  <label>日期（模糊到月，默认本月）</label>
+  <input id="logDate" placeholder="2026.11">
+  <label>标题</label>
+  <input id="logTitle" placeholder="例：第一次通联成功">
+  <label>正文</label>
+  <textarea id="logBody" placeholder="一两句话就行"></textarea>
+  <p class="hint">新动态会排在「动态日志」最前面。</p>
+  <button class="primary" data-add="log">加入暂存</button>
+  <label style="margin-top:22px">现有动态</label>
+  <div id="logList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<!-- 加作品 -->
+<section class="panel" data-panel="work">
+  <label>选择照片（自动复制进 img 目录）</label>
+  <input type="file" id="workFile" accept="image/*">
+  <label>标签（加粗那行）</label>
+  <input id="workLabel" placeholder="例：SUNSET · 江边">
+  <label>说明</label>
+  <input id="workCaption" placeholder="例：桥上的人影，一江碎金">
+  <p class="hint">照片会写进你选择的 img 目录，文件名自动生成。</p>
+  <button class="primary" data-add="work">加入暂存</button>
+  <label style="margin-top:22px">现有作品（点删除可移除）</label>
+  <div id="workList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<!-- 加在路上 -->
+<section class="panel" data-panel="track">
+  <label>地点</label>
+  <input id="trCity" placeholder="例：武功山">
+  <div class="row">
+    <div><label>年月（YYYY-MM）</label><input id="trDate" placeholder="2026-08"></div>
+    <div><label>状态</label>
+      <select id="trState">
+        <option value="done">已完成</option>
+        <option value="plan">规划中（无日期，永远排最后）</option>
+      </select>
+    </div>
+  </div>
+  <label>一句话</label>
+  <input id="trDesc" placeholder="例：日出和云海都见到了">
+  <div class="row">
+    <div><label>类型</label><input id="trType" placeholder="风景 · 徒步"></div>
+    <div><label>Memo</label><input id="trMemo" placeholder="日出 · 云海"></div>
+  </div>
+  <p class="hint">保存后会自动按年月重新排序、重排 WAYPOINT 编号。</p>
+  <button class="primary" data-add="track">加入暂存</button>
+  <label style="margin-top:22px">现有旅途</label>
+  <div id="trackList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<!-- 加愿望 -->
+<section class="panel" data-panel="wish">
+  <label>分类</label>
+  <select id="wishCat">
+    <option value="想去">想去</option>
+    <option value="想买">想买</option>
+    <option value="想学">想学</option>
+  </select>
+  <label>愿望内容</label>
+  <input id="wishItem" placeholder="例：骑川藏线">
+  <button class="primary" data-add="wish">加入暂存</button>
+  <label style="margin-top:22px">现有愿望</label>
+  <div id="wishList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<!-- 装备 -->
+<section class="panel" data-panel="gear">
+  <div class="row">
+    <div><label>类别</label>
+      <select id="grCat">
+        <option>影像</option><option>音频</option><option>骑行</option>
+        <option>电台</option><option>数码</option><option>电脑</option><option>其他</option>
+      </select>
+    </div>
+    <div><label>状态</label>
+      <select id="grState">
+        <option>种草中</option><option>研究中</option><option>攒机中</option>
+        <option>观望中</option><option>在用</option><option>已入手</option>
+      </select>
+    </div>
+  </div>
+  <label>装备名称</label>
+  <input id="grName" placeholder="例：长焦卡片机">
+  <label>一句话</label>
+  <input id="grDesc" placeholder="例：揣兜里的长焦，街拍都想带">
+  <p class="hint">新装备会加到「装备墙」最前面。</p>
+  <button class="primary" data-add="gear">加入暂存</button>
+  <label style="margin-top:22px">现有装备</label>
+  <div id="gearList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<!-- 电台日志 -->
+<section class="panel" data-panel="radio">
+  <div class="row">
+    <div><label>类别</label>
+      <select id="rdCat">
+        <option>进度</option><option>笔记</option><option>听感</option>
+        <option>通联</option><option>设备</option>
+      </select>
+    </div>
+    <div><label>状态</label>
+      <select id="rdState">
+        <option>备考中</option><option>攒机中</option><option>进行中</option>
+        <option>已完成</option><option>占位</option>
+      </select>
+    </div>
+  </div>
+  <label>标题</label>
+  <input id="rdName" placeholder="例：第一次通联成功">
+  <label>一句话</label>
+  <input id="rdDesc" placeholder="例：和河南的HAM通了QSO，信号59">
+  <p class="hint">新电台记录会加到「电台日志」最前面。</p>
+  <button class="primary" data-add="radio">加入暂存</button>
+  <label style="margin-top:22px">现有电台记录</label>
+  <div id="radioList"><p class="hint">连接博客文件后显示。</p></div>
+</section>
+
+<div class="bar">
+  <button class="primary" id="btnSave" disabled>保存写回 index.html</button>
+  <span class="hint">保存后打开 GitHub Desktop 提交推送即可上线。</span>
+</div>
+
+<div id="msg"></div>
+
+<script>
+let blogHandle=null, imgDirHandle=null, blogText='';
+const $=id=>document.getElementById(id);
+const msg=(t,ok=true)=>{const m=$('msg');m.textContent=t;m.className=ok?'ok':'err';};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const pad=n=>String(n).padStart(2,'0');
+function nowYM(){const d=new Date();return d.getFullYear()+'.'+pad(d.getMonth()+1);}
+function nowYMD(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+$('logDate').value=nowYM();
+$('trDate').value=nowYMD();
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===b.dataset.tab));
+});
+
+async function openBlog(){
+  try{
+    const [h]=await window.showOpenFilePicker({types:[{description:'博客页面',accept:{'text/html':['.html']}}]});
+    blogHandle=h;
+    const f=await h.getFile();
+    blogText=await f.text();
+    $('fileStatus').innerHTML='已连接 <b>'+esc(f.name)+'</b>';
+    $('btnSave').disabled=false;
+    renderWorkList();renderLogList();renderTrackList();renderWishList();renderGearList();renderRadioList();
+    msg('博客文件已读取，可以开始添加内容了。');
+  }catch(e){ if(e.name!=='AbortError') msg('打开失败：'+e.message,false); }
+}
+async function pickImgDir(){
+  try{
+    imgDirHandle=await window.showDirectoryPicker();
+    msg('图片目录已选：'+imgDirHandle.name);
+  }catch(e){ if(e.name!=='AbortError') msg('选择目录失败：'+e.message,false); }
+}
+$('btnOpen').onclick=openBlog;
+$('btnImgDir').onclick=pickImgDir;
+
+function needLoaded(){
+  if(!blogText){msg('请先点「选择 index.html」',false);return false;}
+  return true;
+}
+
+let pendingDeleteFiles=[];
+function extractSection(id){
+  const m=blogText.match(new RegExp('<section id="'+id+'">([\\s\\S]*?)<\\/section>'));
+  return m?m[1]:'';
+}
+function bindDel(box, blockText, label, afterDel){
+  const row=document.createElement('div');row.className='witem';
+  row.innerHTML='<span class="wname">'+esc(label)+'</span>';
+  const del=document.createElement('button');del.textContent='删除';
+  del.onclick=()=>{
+    if(!confirm('删除「'+label+'」？'))return;
+    blogText=blogText.replace(blockText,'');
+    afterDel&&afterDel();
+    msg('已标记删除「'+label+'」，点保存后生效。');
+  };
+  row.appendChild(del);box.appendChild(row);
+}
+function renderWorkList(){
+  const box=$('workList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const figs=[...blogText.matchAll(/<figure class="work-item reveal">[\s\S]*?<\/figure>/g)].map(m=>m[0]);
+  if(!figs.length){box.innerHTML='<p class="hint">还没有作品。</p>';return;}
+  box.innerHTML='';
+  figs.forEach((fig)=>{
+    const src=(fig.match(/src="img\/([^"]+)"/)||[])[1]||'';
+    const b=(fig.match(/<b>([^<]*)<\/b>/)||[])[1]||'(未命名)';
+    const row=document.createElement('div');
+    row.className='witem';
+    row.innerHTML='<span class="wname">'+esc(b)+(src?' · '+esc(src):'')+'</span>';
+    const del=document.createElement('button');
+    del.textContent='删除';
+    del.onclick=()=>{
+      if(!confirm('删除「'+b+'」？保存后图片文件也会一起删掉。'))return;
+      blogText=blogText.replace(fig,'');
+      if(src)pendingDeleteFiles.push(src);
+      renderWorkList();
+      msg('已标记删除「'+b+'」，点上方保存后生效。');
+    };
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+// ---- 各面板加入暂存 ----
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=async()=>{
+  if(!needLoaded())return;
+  const t=b.dataset.add;
+  if(t==='log'){
+    const date=$('logDate').value.trim(), title=$('logTitle').value.trim(), body=$('logBody').value.trim();
+    if(!title||!body){msg('标题和正文都要填',false);return;}
+    const card=`\n        <article class="mini-card reveal">\n          <span class="log-date">${esc(date)}</span>\n          <h3>${esc(title)}</h3>\n          <p>${esc(body)}</p>\n        </article>`;
+    blogText=blogText.replace(/(<section id="log">[\s\S]*?<div class="mini-grid">)/,'$1'+card);
+    msg('动态「'+title+'」已加入暂存 ✓ 可继续添加，最后点保存。');
+  }
+  if(t==='work'){
+    const file=$('workFile').files[0], label=$('workLabel').value.trim(), cap=$('workCaption').value.trim();
+    if(!file){msg('先选一张照片',false);return;}
+    if(!imgDirHandle){msg('请先点「选择 img 目录」',false);return;}
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/jpeg/,'jpg');
+    const d=new Date();
+    const fname=`w-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
+    const wh=await imgDirHandle.getFileHandle(fname,{create:true});
+    const w=await wh.createWritable(); await w.write(file); await w.close();
+    const fig=`\n        <figure class="work-item reveal">\n          <img src="img/${fname}" alt="${esc(label)}" loading="lazy">\n          <figcaption class="work-cap"><b>${esc(label)}</b>${esc(cap)}</figcaption>\n        </figure>`;
+    blogText=blogText.replace(/(<section id="works">[\s\S]*?<div class="work-grid">)/,'$1'+fig);
+    msg('作品「'+label+'」已加入暂存 ✓ 图片已存为 '+fname);
+  }
+  if(t==='track'){
+    const city=$('trCity').value.trim(), date=$('trDate').value.trim(), state=$('trState').value;
+    const desc=$('trDesc').value.trim(), type=$('trType').value.trim()||'旅行', memo=$('trMemo').value.trim()||'-';
+    if(!city||!desc){msg('地点和一句话都要填',false);return;}
+    const isPlan=state==='plan';
+    const attrDate=isPlan?'' : ` data-date="${esc(date)}"`;
+    const stateHtml=isPlan
+      ? `<span class="track-state">规划中</span>`
+      : `<span class="track-state track-state--done">已完成</span>`;
+    const timeHtml=isPlan?'规划中':esc(date.replace('-','.'));
+    const card=`\n        <article class="track-card reveal"${attrDate}>\n          <span class="track-no">WAYPOINT 00</span>\n          ${stateHtml}\n          <h3>${esc(city)}</h3>\n          <p>${esc(desc)}</p>\n          <div class="exif"><span><b>TIME</b> ${timeHtml}</span><span><b>TYPE</b> ${esc(type)}</span><span><b>MEMO</b> ${esc(memo)}</span></div>\n        </article>`;
+    blogText=blogText.replace(/(<section id="track">[\s\S]*?<div class="track-grid">)/,'$1'+card);
+    reorderTracks();
+    msg('在路上「'+city+'」已加入暂存 ✓ 已自动排序。');
+  }
+  if(t==='wish'){
+    const cat=$('wishCat').value, item=$('wishItem').value.trim();
+    if(!item){msg('写点想做的',false);return;}
+    const re=new RegExp('(<h3>'+cat+'<\\/h3>\\s*<ul>)([\\s\\S]*?)(<\\/ul>)');
+    blogText=blogText.replace(re,`$1$2            <li>${esc(item)}</li>\n          `+'$3');
+    msg('愿望已加入「'+cat+'」✓');
+  }
+  if(t==='gear'){
+    const cat=$('grCat').value, state=$('grState').value;
+    const name=$('grName').value.trim(), desc=$('grDesc').value.trim();
+    if(!name||!desc){msg('装备名称和一句话都要填',false);return;}
+    const card=`\n        <article class="mini-card reveal">\n          <span class="mini-tag mini-tag--accent">${esc(cat)} · ${esc(state)}</span>\n          <h3>${esc(name)}</h3>\n          <p>${esc(desc)}</p>\n        </article>`;
+    blogText=blogText.replace(/(<section id="gear">[\s\S]*?<div class="mini-grid mini-3">)/,'$1'+card);
+    renderGearList();
+    msg('装备「'+name+'」已加入暂存 ✓');
+  }
+  if(t==='radio'){
+    const cat=$('rdCat').value, state=$('rdState').value;
+    const name=$('rdName').value.trim(), desc=$('rdDesc').value.trim();
+    if(!name||!desc){msg('标题和一句话都要填',false);return;}
+    const card=`\n        <article class="mini-card reveal">\n          <span class="mini-tag">${esc(cat)} · ${esc(state)}</span>\n          <h3>${esc(name)}</h3>\n          <p>${esc(desc)}</p>\n        </article>`;
+    blogText=blogText.replace(/(<section id="radio">[\s\S]*?<div class="mini-grid mini-2">)/,'$1'+card);
+    renderRadioList();
+    msg('电台记录「'+name+'」已加入暂存 ✓');
+  }
+});
+
+// 重排 track：有日期正序在前，无日期（规划中）在后；重编 WAYPOINT
+function reorderTracks(){
+  const block=blogText.match(/<div class="track-grid">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/);
+  if(!block)return;
+  const cards=[...block[1].matchAll(/<article class="track-card reveal"[^>]*>[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  cards.sort((a,b)=>{
+    const da=(a.match(/data-date="([^"]*)"/)||[])[1]||'9999-99';
+    const db=(b.match(/data-date="([^"]*)"/)||[])[1]||'9999-99';
+    return da<db?-1:da>db?1:0;
+  });
+  const rebuilt=cards.map((c,i)=>c.replace(/WAYPOINT \d+/,'WAYPOINT '+String(i+1).padStart(2,'0'))).join('\n');
+  blogText=blogText.replace(block[0],'<div class="track-grid">'+rebuilt+'\n      </div>\n    </div>\n  </section>');
+}
+
+function renderLogList(){
+  const box=$('logList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const sec=extractSection('log');
+  const cards=[...sec.matchAll(/<article class="mini-card reveal">[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  box.innerHTML='';
+  cards.forEach(card=>{
+    const date=(card.match(/log-date">([^<]*)</)||[])[1]||'';
+    const title=(card.match(/<h3>([^<]*)<\/h3>/)||[])[1]||'';
+    bindDel(box, card, date+' · '+title, renderLogList);
+  });
+  if(!cards.length)box.innerHTML='<p class="hint">暂无。</p>';
+}
+
+function renderTrackList(){
+  const box=$('trackList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const sec=extractSection('track');
+  const cards=[...sec.matchAll(/<article class="track-card reveal"[^>]*>[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  box.innerHTML='';
+  cards.forEach(card=>{
+    const city=(card.match(/<h3>([^<]*)<\/h3>/)||[])[1]||'';
+    const d=(card.match(/data-date="([^"]*)"/)||[])[1]||'规划中';
+    bindDel(box, card, city+' · '+d, renderTrackList);
+  });
+  if(!cards.length)box.innerHTML='<p class="hint">暂无。</p>';
+}
+
+function renderWishList(){
+  const box=$('wishList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const sec=extractSection('wishlist');
+  const items=[...sec.matchAll(/<li>[^<]*<\/li>/g)].map(m=>m[0]);
+  box.innerHTML='';
+  items.forEach(li=>{
+    const txt=(li.match(/<li>([^<]*)<\/li>/)||[])[1]||'';
+    bindDel(box, li, txt, renderWishList);
+  });
+  if(!items.length)box.innerHTML='<p class="hint">暂无。</p>';
+}
+
+function renderGearList(){
+  const box=$('gearList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const sec=extractSection('gear');
+  const cards=[...sec.matchAll(/<article class="mini-card reveal">[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  box.innerHTML='';
+  cards.forEach(card=>{
+    const tag=(card.match(/mini-tag--accent">([^<]*)</)||[])[1]||'';
+    const name=(card.match(/<h3>([^<]*)<\/h3>/)||[])[1]||'';
+    bindDel(box, card, tag+' · '+name, renderGearList);
+  });
+  if(!cards.length)box.innerHTML='<p class="hint">暂无。</p>';
+}
+
+function renderRadioList(){
+  const box=$('radioList');
+  if(!blogText){box.innerHTML='<p class="hint">连接博客文件后显示。</p>';return;}
+  const sec=extractSection('radio');
+  const cards=[...sec.matchAll(/<article class="mini-card reveal">[\s\S]*?<\/article>/g)].map(m=>m[0]);
+  box.innerHTML='';
+  cards.forEach(card=>{
+    const tag=(card.match(/mini-tag">([^<]*)</)||[])[1]||'';
+    const name=(card.match(/<h3>([^<]*)<\/h3>/)||[])[1]||'';
+    bindDel(box, card, tag+' · '+name, renderRadioList);
+  });
+  if(!cards.length)box.innerHTML='<p class="hint">暂无。</p>';
+}
+
+$('btnSave').onclick=async()=>{
+  if(!blogHandle){msg('未连接文件',false);return;}
+  try{
+    const w=await blogHandle.createWritable();
+    await w.write(blogText); await w.close();
+    if(imgDirHandle && pendingDeleteFiles.length){
+      for(const f of pendingDeleteFiles){
+        try{ await imgDirHandle.removeEntry(f); }catch(e){}
+      }
+      pendingDeleteFiles=[];
+    }
+    renderWorkList();renderLogList();renderTrackList();renderWishList();renderGearList();renderRadioList();
+    msg('已写回 index.html ✓ 现在去 GitHub Desktop 提交推送吧。');
+  }catch(e){msg('保存失败：'+e.message,false);}
+};
+
+if(!window.showOpenFilePicker){
+  msg('当前浏览器不支持本地文件写入，请用 Chrome 或 Edge 打开本页面。',false);
+}
+</script>
+</body>
+</html>
